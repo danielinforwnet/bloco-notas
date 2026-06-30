@@ -659,7 +659,7 @@ input, select, textarea { font-family: inherit; }
 .note-action-btn.active { color: #f59e0b; }
 .note-action-btn.danger:hover { color: var(--danger); }
 
-.note-card-body { font-size: 13px; color: var(--text-secondary); line-height: 1.6; flex: 1; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
+.note-card-body { font-size: 13px; color: var(--text-secondary); line-height: 1.6; flex: 1; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; white-space: pre-line; }
 
 .note-card-footer { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .note-category-badge {
@@ -1321,7 +1321,7 @@ kbd {
   <div class="modal-overlay hidden" id="editor-overlay" onclick="handleOverlayClick(event)">
     <div class="editor-modal" id="editor-modal">
       <div class="editor-header">
-        <input type="text" class="editor-title" id="editor-title" placeholder="Título da nota…" maxlength="150" />
+        <input type="text" class="editor-title" id="editor-title" placeholder="Título da nota…" maxlength="150" oninput="onEditorInput()" />
         <div class="editor-actions">
           <span class="autosave-indicator" id="autosave-indicator"><i class="fa-solid fa-circle-check"></i> Salvo</span>
           <button class="btn-icon" onclick="exportNotePDF()" title="Exportar PDF"><i class="fa-solid fa-file-pdf"></i></button>
@@ -1803,7 +1803,7 @@ function getFilteredNotes() {
     var q = searchQuery.toLowerCase();
     list = list.filter(function(n) {
       return (n.title || "").toLowerCase().includes(q) ||
-             (n.content || "").toLowerCase().replace(/<[^>]+>/g, "").includes(q) ||
+             stripHtml(n.content).toLowerCase().includes(q) ||
              (n.categoryName || "").toLowerCase().includes(q) ||
              (n.tags || []).some(function(t) { return t.toLowerCase().includes(q); });
     });
@@ -1848,7 +1848,7 @@ function buildNoteCard(note) {
     if (!e.target.closest(".note-action-btn")) openNoteEditor(note);
   };
 
-  var plainText = (note.content || "").replace(/<[^>]+>/g, "");
+  var plainText = stripHtml(note.content);
   var catName   = note.categoryName || "";
   var catIcon   = note.categoryIcon || "fa-folder";
   var tags      = note.tags || [];
@@ -1878,6 +1878,18 @@ function buildNoteCard(note) {
     '</div>';
 
   return card;
+}
+
+// Converte HTML para texto plano preservando quebras entre blocos
+function stripHtml(htmlStr) {
+  if (!htmlStr) return "";
+  return htmlStr
+    .replace(/<\/(p|div|li|h1|h2|h3|h4|br)\s*>/gi, "\n")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
 function highlight(text) {
