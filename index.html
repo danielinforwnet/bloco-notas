@@ -1,0 +1,2599 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NoteFlow – Seu Bloco de Notas Inteligente</title>
+  <meta name="description" content="Bloco de notas moderno com sincronização em tempo real" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+/* ══════════════════════════════════════════════════════════════
+   NoteFlow – Main Stylesheet
+   Design: Indigo/Violet palette, Inter typeface, glass morphism
+   ══════════════════════════════════════════════════════════════ */
+
+/* ─── CSS Variables ─────────────────────────────────────────── */
+:root {
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --primary-light: #a5b4fc;
+  --primary-glow: rgba(99,102,241,0.15);
+
+  --bg: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-hover: #f1f5f9;
+  --bg-sidebar: #ffffff;
+  --bg-navbar: rgba(255,255,255,0.85);
+
+  --border: #e2e8f0;
+  --border-light: #f1f5f9;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --text-placeholder: #cbd5e1;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.05);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --sidebar-w: 260px;
+  --navbar-h: 60px;
+  --transition: 0.2s ease;
+  --transition-slow: 0.35s cubic-bezier(0.4,0,0.2,1);
+
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+}
+
+[data-theme="dark"] {
+  --bg: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-card: #1e293b;
+  --bg-hover: #334155;
+  --bg-sidebar: #1e293b;
+  --bg-navbar: rgba(15,23,42,0.9);
+
+  --border: #334155;
+  --border-light: #1e293b;
+
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-placeholder: #475569;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -2px rgba(0,0,0,0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.3), 0 4px 6px -4px rgba(0,0,0,0.2);
+  --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.4), 0 8px 10px -6px rgba(0,0,0,0.3);
+}
+
+/* ─── Reset & Base ───────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.5;
+  transition: background var(--transition-slow), color var(--transition);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+input, select, textarea { font-family: inherit; }
+::placeholder { color: var(--text-placeholder); }
+
+.hidden { display: none !important; }
+.ml-auto { margin-left: auto; }
+
+/* ─── Auth Screen ────────────────────────────────────────────── */
+.auth-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.auth-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.auth-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+  animation: blobFloat 8s ease-in-out infinite;
+}
+.blob-1 { width: 500px; height: 500px; background: #6366f1; top: -150px; left: -150px; animation-delay: 0s; }
+.blob-2 { width: 400px; height: 400px; background: #8b5cf6; bottom: -100px; right: -100px; animation-delay: 3s; }
+.blob-3 { width: 300px; height: 300px; background: #ec4899; top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: 6s; }
+
+@keyframes blobFloat {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  33% { transform: translate(20px,-20px) scale(1.05); }
+  66% { transform: translate(-15px,15px) scale(0.98); }
+}
+
+.auth-card {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(20px);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  width: 420px;
+  max-width: 95vw;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+  animation: cardSlideIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+@keyframes cardSlideIn {
+  from { opacity: 0; transform: translateY(30px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.auth-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.logo-icon {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, var(--primary), #8b5cf6);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+  box-shadow: 0 4px 14px var(--primary-glow);
+}
+.logo-icon.sm { width: 32px; height: 32px; font-size: 14px; border-radius: 8px; }
+
+.logo-text {
+  font-size: 22px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.auth-panel { display: none; }
+.auth-panel.active { display: block; animation: fadeSlide 0.3s ease; }
+
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateX(10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.auth-panel h2 { font-size: 24px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+.auth-subtitle { color: #64748b; margin-bottom: 24px; font-size: 14px; }
+
+.form-group { margin-bottom: 16px; }
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+  margin-bottom: 6px;
+}
+.form-group label i { margin-right: 4px; color: var(--primary); }
+
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: #0f172a;
+  background: #f8fafc;
+  transition: all var(--transition);
+  outline: none;
+}
+.form-group input:focus, .form-group select:focus {
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.input-password { position: relative; }
+.input-password input { padding-right: 44px; }
+.toggle-pw {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 14px;
+  transition: color var(--transition);
+}
+.toggle-pw:hover { color: var(--primary); }
+
+.btn-forgot {
+  display: block;
+  font-size: 13px;
+  color: var(--primary);
+  margin-bottom: 16px;
+  text-align: right;
+  width: 100%;
+}
+.btn-forgot:hover { text-decoration: underline; }
+
+.btn-primary {
+  width: 100%;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, var(--primary), #8b5cf6);
+  color: white;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 600;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px var(--primary-glow);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99,102,241,0.4); }
+.btn-primary:active { transform: translateY(0); }
+
+.btn-secondary {
+  padding: 10px 20px;
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all var(--transition);
+  border: 1.5px solid var(--border);
+}
+.btn-secondary:hover { background: var(--border); color: var(--text-primary); }
+
+.btn-danger {
+  padding: 10px 20px;
+  background: var(--danger);
+  color: white;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all var(--transition);
+}
+.btn-danger:hover { background: #dc2626; }
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+  color: #94a3b8;
+  font-size: 13px;
+}
+.auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: #e2e8f0; }
+
+.btn-google {
+  width: 100%;
+  padding: 11px 20px;
+  background: white;
+  color: #374151;
+  border: 1.5px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all var(--transition);
+}
+.btn-google:hover { background: #f9fafb; border-color: #d1d5db; box-shadow: var(--shadow-sm); }
+.btn-google .fa-google { color: #ea4335; }
+
+.auth-switch { margin-top: 20px; text-align: center; font-size: 14px; color: #64748b; }
+.auth-switch a { color: var(--primary); font-weight: 600; }
+
+/* ─── App Layout ─────────────────────────────────────────────── */
+.app-screen { min-height: 100vh; display: flex; flex-direction: column; }
+
+/* Navbar */
+.navbar {
+  height: var(--navbar-h);
+  background: var(--bg-navbar);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: background var(--transition-slow);
+}
+
+.nav-left { display: flex; align-items: center; gap: 12px; min-width: var(--sidebar-w); }
+.nav-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; color: var(--text-primary); }
+.nav-logo span { background: linear-gradient(135deg, var(--primary), #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+.nav-search {
+  flex: 1;
+  max-width: 560px;
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 10px;
+  transition: all var(--transition);
+}
+.nav-search:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+.nav-search i { color: var(--text-muted); font-size: 14px; }
+.nav-search input { flex: 1; border: none; background: none; outline: none; font-size: 14px; color: var(--text-primary); }
+.search-hint { font-size: 11px; color: var(--text-muted); background: var(--bg-hover); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); white-space: nowrap; }
+
+.nav-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+
+.btn-icon {
+  width: 36px; height: 36px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+}
+.btn-icon:hover { background: var(--bg-hover); color: var(--text-primary); }
+.btn-icon.active { background: var(--primary-glow); color: var(--primary); }
+
+.user-menu { position: relative; cursor: pointer; }
+.user-avatar {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--primary), #8b5cf6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  user-select: none;
+}
+
+.user-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  min-width: 200px;
+  padding: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
+  transition: all var(--transition);
+  z-index: 200;
+}
+.user-dropdown.open { opacity: 1; pointer-events: all; transform: translateY(0); }
+.user-info { padding: 8px; }
+.user-info strong { display: block; font-size: 14px; color: var(--text-primary); }
+.user-info small { color: var(--text-muted); font-size: 12px; }
+.user-dropdown hr { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
+.user-dropdown button { width: 100%; padding: 8px 12px; border-radius: var(--radius-sm); font-size: 14px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; text-align: left; transition: background var(--transition); }
+.user-dropdown button:hover { background: var(--bg-hover); color: var(--danger); }
+
+/* Layout */
+.layout { display: flex; height: calc(100vh - var(--navbar-h)); overflow: hidden; }
+
+/* Sidebar */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-shrink: 0;
+  transition: width var(--transition-slow), opacity var(--transition-slow);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.sidebar.collapsed { width: 0; opacity: 0; }
+
+.sidebar-nav { padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; min-width: var(--sidebar-w); }
+
+.btn-new-note {
+  width: 100%;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, var(--primary), #8b5cf6);
+  color: white;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  transition: all var(--transition);
+  box-shadow: 0 4px 14px var(--primary-glow);
+}
+.btn-new-note:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99,102,241,0.4); }
+
+.nav-section { margin-bottom: 8px; }
+.nav-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding: 8px 8px 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 14px;
+  transition: all var(--transition);
+  position: relative;
+}
+.nav-item:hover { background: var(--bg-hover); color: var(--text-primary); text-decoration: none; }
+.nav-item.active { background: var(--primary-glow); color: var(--primary); font-weight: 500; }
+.nav-item i { width: 16px; text-align: center; font-size: 13px; }
+
+.badge {
+  margin-left: auto;
+  background: var(--bg-hover);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 999px;
+  min-width: 20px;
+  text-align: center;
+}
+.nav-item.active .badge { background: var(--primary-glow); color: var(--primary); }
+
+.btn-icon-sm {
+  width: 20px; height: 20px;
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+}
+.btn-icon-sm:hover { background: var(--bg-hover); color: var(--primary); }
+
+.category-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all var(--transition);
+  position: relative;
+}
+.category-item:hover { background: var(--bg-hover); }
+.category-item.active { background: var(--primary-glow); color: var(--primary); }
+.category-item .cat-actions { margin-left: auto; opacity: 0; display: flex; gap: 2px; }
+.category-item:hover .cat-actions { opacity: 1; }
+
+.tags-cloud { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px 4px 0; }
+.tag-chip {
+  padding: 3px 8px;
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  border-radius: 999px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all var(--transition);
+  border: 1.5px solid transparent;
+}
+.tag-chip:hover { border-color: var(--primary); color: var(--primary); }
+.tag-chip.active { background: var(--primary-glow); color: var(--primary); border-color: var(--primary); }
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+/* Dashboard Stats */
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition);
+}
+.stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+.stat-icon {
+  width: 48px; height: 48px;
+  background: var(--primary-glow);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.stat-icon.star { background: rgba(245,158,11,0.12); color: #f59e0b; }
+.stat-icon.archive { background: rgba(16,185,129,0.12); color: #10b981; }
+.stat-icon.access { background: rgba(59,130,246,0.12); color: #3b82f6; }
+
+.stat-info { min-width: 0; }
+.stat-value { display: block; font-size: 22px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stat-label { font-size: 12px; color: var(--text-muted); }
+
+/* Notes Toolbar */
+.notes-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.section-title { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+.toolbar-right { display: flex; align-items: center; gap: 8px; }
+
+.sort-select {
+  padding: 7px 12px;
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  outline: none;
+  transition: all var(--transition);
+}
+.sort-select:focus { border-color: var(--primary); }
+
+.view-toggle { display: flex; gap: 2px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 2px; }
+
+/* Notes Grid */
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+.notes-grid.list-view { grid-template-columns: 1fr; }
+
+/* Note Card */
+.note-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  cursor: pointer;
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: cardAppear 0.3s ease;
+}
+@keyframes cardAppear { from { opacity:0; transform: scale(0.97) translateY(8px); } to { opacity:1; transform: scale(1) translateY(0); } }
+
+.note-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), #8b5cf6);
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.note-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: transparent; }
+.note-card:hover::before { opacity: 1; }
+
+.note-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.note-card-title { font-size: 15px; font-weight: 600; color: var(--text-primary); line-height: 1.4; flex: 1; word-break: break-word; }
+.note-card-actions { display: flex; gap: 2px; opacity: 0; transition: opacity var(--transition); flex-shrink: 0; }
+.note-card:hover .note-card-actions { opacity: 1; }
+
+.note-action-btn {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+}
+.note-action-btn:hover { background: var(--bg-hover); color: var(--primary); }
+.note-action-btn.active { color: #f59e0b; }
+.note-action-btn.danger:hover { color: var(--danger); }
+
+.note-card-body { font-size: 13px; color: var(--text-secondary); line-height: 1.6; flex: 1; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
+
+.note-card-footer { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.note-category-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  background: var(--primary-glow);
+  color: var(--primary);
+  border-radius: 999px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.note-tag-badge {
+  font-size: 11px;
+  padding: 2px 6px;
+  background: var(--bg-hover);
+  color: var(--text-muted);
+  border-radius: 999px;
+}
+.note-date { font-size: 11px; color: var(--text-muted); margin-left: auto; white-space: nowrap; }
+
+/* List view overrides */
+.notes-grid.list-view .note-card { flex-direction: row; align-items: center; padding: 12px 18px; }
+.notes-grid.list-view .note-card-header { flex: 0 0 220px; }
+.notes-grid.list-view .note-card-body { -webkit-line-clamp: 1; flex: 1; }
+.notes-grid.list-view .note-card-footer { flex: 0 0 auto; }
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+}
+.empty-icon { font-size: 56px; color: var(--primary-light); margin-bottom: 20px; opacity: 0.6; }
+.empty-state h3 { font-size: 20px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
+.empty-state p { color: var(--text-muted); margin-bottom: 24px; }
+.empty-state .btn-primary { width: auto; }
+
+/* Content loader */
+.content-loader { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 60px; color: var(--text-muted); font-size: 14px; }
+
+/* ─── Editor Modal ───────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: overlayFade 0.2s ease;
+}
+@keyframes overlayFade { from { opacity: 0; } to { opacity: 1; } }
+
+.editor-modal {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 860px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-xl);
+  animation: modalSlide 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  overflow: hidden;
+}
+@keyframes modalSlide { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+.editor-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.editor-title {
+  flex: 1;
+  border: none;
+  background: none;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  outline: none;
+}
+.editor-title::placeholder { color: var(--text-placeholder); }
+
+.editor-actions { display: flex; align-items: center; gap: 4px; }
+.autosave-indicator { font-size: 12px; color: var(--success); display: flex; align-items: center; gap: 4px; padding: 0 8px; white-space: nowrap; }
+.autosave-indicator.saving { color: var(--warning); }
+.autosave-indicator.saving i { animation: spin 1s linear infinite; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.editor-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.meta-group { display: flex; align-items: center; gap: 6px; }
+.meta-group label { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.meta-group select {
+  padding: 4px 8px;
+  background: var(--bg-hover);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  outline: none;
+}
+
+.color-picker { display: flex; gap: 6px; }
+.color-swatch {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid var(--border);
+  transition: all var(--transition);
+}
+.color-swatch:hover { transform: scale(1.2); border-color: var(--primary); }
+.color-swatch.active { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-glow); transform: scale(1.15); }
+
+.tags-input-wrap { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; min-width: 120px; }
+.tags-input { display: flex; flex-wrap: wrap; gap: 4px; }
+.tag-pill {
+  background: var(--primary-glow);
+  color: var(--primary);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.tag-pill button { color: var(--primary); font-size: 10px; opacity: 0.7; }
+.tag-pill button:hover { opacity: 1; }
+#tag-input { border: none; background: none; outline: none; font-size: 12px; color: var(--text-secondary); width: 100px; }
+
+.meta-actions { display: flex; gap: 4px; margin-left: auto; }
+.btn-meta {
+  width: 32px; height: 32px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+}
+.btn-meta:hover { background: var(--bg-hover); color: var(--primary); }
+.btn-meta.active-fav { color: #f59e0b; }
+.btn-meta.active-arch { color: var(--primary); }
+
+/* Editor Toolbar */
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  background: var(--bg);
+}
+.toolbar-group { display: flex; align-items: center; gap: 1px; padding: 0 4px; border-right: 1px solid var(--border); }
+.toolbar-group:last-child { border-right: none; }
+.toolbar-group select {
+  padding: 4px 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  outline: none;
+}
+
+.toolbar-btn {
+  width: 30px; height: 30px;
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+}
+.toolbar-btn:hover { background: var(--bg-hover); color: var(--primary); }
+
+.word-count { font-size: 11px; color: var(--text-muted); white-space: nowrap; padding: 0 8px; }
+
+/* Editor Body */
+.editor-body {
+  flex: 1;
+  padding: 20px 24px;
+  overflow-y: auto;
+  outline: none;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text-primary);
+  min-height: 300px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.editor-body:empty::before { content: attr(placeholder); color: var(--text-placeholder); pointer-events: none; }
+.editor-body h1 { font-size: 28px; font-weight: 700; margin: 16px 0 8px; }
+.editor-body h2 { font-size: 22px; font-weight: 600; margin: 14px 0 6px; }
+.editor-body h3 { font-size: 18px; font-weight: 600; margin: 12px 0 4px; }
+.editor-body ul, .editor-body ol { padding-left: 24px; margin: 8px 0; }
+.editor-body li { margin: 4px 0; }
+.editor-body a { color: var(--primary); }
+.editor-body blockquote { border-left: 3px solid var(--primary); padding-left: 16px; margin: 12px 0; color: var(--text-secondary); font-style: italic; }
+.editor-body img { max-width: 100%; border-radius: var(--radius-md); margin: 8px 0; }
+.editor-body p { margin: 4px 0; }
+
+.editor-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 20px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.btn-link { color: var(--primary); font-size: 12px; display: flex; align-items: center; gap: 4px; transition: opacity var(--transition); }
+.btn-link:hover { opacity: 0.7; }
+
+.history-panel {
+  border-top: 1px solid var(--border);
+  max-height: 180px;
+  overflow-y: auto;
+  background: var(--bg);
+}
+.history-header { padding: 8px 20px; font-size: 13px; border-bottom: 1px solid var(--border); }
+.history-item { padding: 8px 20px; display: flex; align-items: center; gap: 10px; font-size: 13px; border-bottom: 1px solid var(--border-light); transition: background var(--transition); }
+.history-item:hover { background: var(--bg-hover); }
+.history-time { color: var(--text-muted); font-size: 12px; white-space: nowrap; }
+.history-preview { color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.history-restore { font-size: 11px; color: var(--primary); cursor: pointer; }
+.history-restore:hover { text-decoration: underline; }
+
+/* ─── Simple Modal ───────────────────────────────────────────── */
+.simple-modal {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow-xl);
+  animation: modalSlide 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+.simple-modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.simple-modal-header h3 { font-size: 18px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+
+.confirm-modal { text-align: center; }
+.confirm-icon { font-size: 40px; color: var(--warning); margin-bottom: 12px; }
+.confirm-modal h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+.confirm-modal p { font-size: 14px; color: var(--text-muted); }
+.confirm-modal .modal-actions { justify-content: center; }
+
+.icon-picker { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 0; }
+.icon-opt {
+  width: 36px; height: 36px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+  cursor: pointer;
+}
+.icon-opt:hover { border-color: var(--primary); color: var(--primary); }
+.icon-opt.active { background: var(--primary-glow); border-color: var(--primary); color: var(--primary); }
+
+/* Shortcuts modal */
+.shortcuts-modal { max-width: 480px; }
+.shortcuts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.shortcut-item { display: flex; align-items: center; gap: 12px; padding: 8px; border-radius: var(--radius-sm); background: var(--bg); }
+.shortcut-item span { font-size: 13px; color: var(--text-secondary); }
+kbd {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-family: monospace;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ─── Toasts ─────────────────────────────────────────────────── */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 1000;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  font-size: 14px;
+  color: var(--text-primary);
+  min-width: 240px;
+  max-width: 360px;
+  animation: toastIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  cursor: pointer;
+}
+.toast.toast-out { animation: toastOut 0.25s ease forwards; }
+@keyframes toastIn { from { opacity:0; transform: translateX(100%) scale(0.95); } to { opacity:1; transform: translateX(0) scale(1); } }
+@keyframes toastOut { to { opacity:0; transform: translateX(100%) scale(0.95); } }
+
+.toast i { font-size: 16px; flex-shrink: 0; }
+.toast.success i { color: var(--success); }
+.toast.error i { color: var(--danger); }
+.toast.info i { color: var(--info); }
+.toast.warning i { color: var(--warning); }
+
+/* ─── Spinners & Loaders ─────────────────────────────────────── */
+.spinner {
+  width: 28px; height: 28px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+.spinner.lg { width: 44px; height: 44px; border-width: 4px; }
+
+.global-loader {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Responsiveness ─────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .dashboard-stats { grid-template-columns: 1fr 1fr; }
+  .nav-left { min-width: auto; }
+  .search-hint { display: none; }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: var(--navbar-h);
+    height: calc(100vh - var(--navbar-h));
+    z-index: 200;
+    box-shadow: var(--shadow-xl);
+    transition: transform var(--transition-slow), opacity var(--transition-slow);
+  }
+  .sidebar.collapsed { transform: translateX(-100%); width: var(--sidebar-w); opacity: 1; }
+  .main-content { padding: 16px; }
+  .notes-grid { grid-template-columns: 1fr 1fr; }
+  .dashboard-stats { grid-template-columns: 1fr 1fr; }
+  .editor-meta { gap: 8px; }
+  .meta-group label { display: none; }
+}
+
+@media (max-width: 500px) {
+  .notes-grid { grid-template-columns: 1fr; }
+  .dashboard-stats { grid-template-columns: 1fr; }
+  .nav-search { display: none; }
+  .auth-card { padding: 28px 20px; }
+  .editor-toolbar { gap: 1px; }
+  .toolbar-group select { display: none; }
+  .notes-grid.list-view .note-card { flex-direction: column; }
+}
+
+/* ─── Scrollbar Styling ──────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ─── Search highlight ───────────────────────────────────────── */
+.highlight { background: rgba(253,224,71,0.5); border-radius: 2px; }
+
+/* ─── Sidebar overlay (mobile) ───────────────────────────────── */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 190;
+  top: var(--navbar-h);
+}
+.sidebar-overlay.visible { display: block; }
+
+</style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════ AUTH SCREEN ═══════════════════════════════ -->
+  <div id="auth-screen" class="auth-screen">
+    <div class="auth-bg">
+      <div class="auth-blob blob-1"></div>
+      <div class="auth-blob blob-2"></div>
+      <div class="auth-blob blob-3"></div>
+    </div>
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="logo-icon"><i class="fa-solid fa-pen-nib"></i></div>
+        <span class="logo-text">NoteFlow</span>
+      </div>
+
+      <!-- Login Form -->
+      <div id="login-panel" class="auth-panel active">
+        <h2>Bem-vindo de volta</h2>
+        <p class="auth-subtitle">Entre na sua conta para continuar</p>
+        <div class="form-group">
+          <label><i class="fa-solid fa-envelope"></i> E-mail</label>
+          <input type="email" id="login-email" placeholder="seu@email.com" autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label><i class="fa-solid fa-lock"></i> Senha</label>
+          <div class="input-password">
+            <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" />
+            <button type="button" class="toggle-pw" onclick="togglePassword('login-password', this)"><i class="fa-solid fa-eye"></i></button>
+          </div>
+        </div>
+        <button class="btn-forgot" onclick="showPanel('forgot')">Esqueceu a senha?</button>
+        <button class="btn-primary" onclick="handleLogin()"><i class="fa-solid fa-arrow-right-to-bracket"></i> Entrar</button>
+        <div class="auth-divider"><span>ou</span></div>
+        <button class="btn-google" onclick="handleGoogleLogin()"><i class="fa-brands fa-google"></i> Continuar com Google</button>
+        <p class="auth-switch">Não tem conta? <a href="#" onclick="showPanel('register')">Criar conta</a></p>
+      </div>
+
+      <!-- Register Form -->
+      <div id="register-panel" class="auth-panel">
+        <h2>Criar conta</h2>
+        <p class="auth-subtitle">Comece a organizar suas ideias</p>
+        <div class="form-group">
+          <label><i class="fa-solid fa-user"></i> Nome</label>
+          <input type="text" id="reg-name" placeholder="Seu nome completo" />
+        </div>
+        <div class="form-group">
+          <label><i class="fa-solid fa-envelope"></i> E-mail</label>
+          <input type="email" id="reg-email" placeholder="seu@email.com" />
+        </div>
+        <div class="form-group">
+          <label><i class="fa-solid fa-lock"></i> Senha</label>
+          <div class="input-password">
+            <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" />
+            <button type="button" class="toggle-pw" onclick="togglePassword('reg-password', this)"><i class="fa-solid fa-eye"></i></button>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="handleRegister()"><i class="fa-solid fa-user-plus"></i> Criar conta</button>
+        <p class="auth-switch">Já tem conta? <a href="#" onclick="showPanel('login')">Entrar</a></p>
+      </div>
+
+      <!-- Forgot Password -->
+      <div id="forgot-panel" class="auth-panel">
+        <h2>Recuperar senha</h2>
+        <p class="auth-subtitle">Enviaremos um link para seu e-mail</p>
+        <div class="form-group">
+          <label><i class="fa-solid fa-envelope"></i> E-mail</label>
+          <input type="email" id="forgot-email" placeholder="seu@email.com" />
+        </div>
+        <button class="btn-primary" onclick="handleForgotPassword()"><i class="fa-solid fa-paper-plane"></i> Enviar link</button>
+        <p class="auth-switch"><a href="#" onclick="showPanel('login')"><i class="fa-solid fa-arrow-left"></i> Voltar ao login</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ APP SCREEN ═══════════════════════════════ -->
+  <div id="app-screen" class="app-screen hidden">
+
+    <!-- TOP NAVBAR -->
+    <header class="navbar">
+      <div class="nav-left">
+        <button class="btn-icon sidebar-toggle" onclick="toggleSidebar()" title="Menu (Ctrl+B)">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="nav-logo">
+          <div class="logo-icon sm"><i class="fa-solid fa-pen-nib"></i></div>
+          <span>NoteFlow</span>
+        </div>
+      </div>
+
+      <div class="nav-search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="search" id="global-search" placeholder="Pesquisar notas… (Ctrl+K)" oninput="handleSearch(this.value)" />
+        <kbd class="search-hint">Ctrl+K</kbd>
+      </div>
+
+      <div class="nav-right">
+        <button class="btn-icon" onclick="toggleTheme()" title="Alternar tema (Ctrl+D)" id="theme-btn">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <button class="btn-icon" title="Atalhos" onclick="showShortcuts()">
+          <i class="fa-solid fa-keyboard"></i>
+        </button>
+        <div class="user-menu" onclick="toggleUserMenu()">
+          <div class="user-avatar" id="user-avatar">U</div>
+          <div class="user-dropdown" id="user-dropdown">
+            <div class="user-info">
+              <strong id="user-name-display">Usuário</strong>
+              <small id="user-email-display"></small>
+            </div>
+            <hr />
+            <button onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- LAYOUT WRAPPER -->
+    <div class="layout">
+
+      <!-- SIDEBAR -->
+      <aside class="sidebar" id="sidebar">
+        <nav class="sidebar-nav">
+          <button class="btn-new-note" onclick="openNoteEditor(null)" title="Nova nota (Ctrl+N)">
+            <i class="fa-solid fa-plus"></i> Nova Nota
+          </button>
+
+          <div class="nav-section">
+            <span class="nav-label">Principal</span>
+            <a href="#" class="nav-item active" data-filter="all" onclick="setFilter('all', this)">
+              <i class="fa-solid fa-house"></i> Todas as notas
+              <span class="badge" id="badge-all">0</span>
+            </a>
+            <a href="#" class="nav-item" data-filter="favorites" onclick="setFilter('favorites', this)">
+              <i class="fa-solid fa-star"></i> Favoritas
+              <span class="badge" id="badge-favorites">0</span>
+            </a>
+            <a href="#" class="nav-item" data-filter="archived" onclick="setFilter('archived', this)">
+              <i class="fa-solid fa-box-archive"></i> Arquivadas
+              <span class="badge" id="badge-archived">0</span>
+            </a>
+            <a href="#" class="nav-item" data-filter="trash" onclick="setFilter('trash', this)">
+              <i class="fa-solid fa-trash"></i> Lixeira
+              <span class="badge" id="badge-trash">0</span>
+            </a>
+          </div>
+
+          <div class="nav-section">
+            <span class="nav-label">Categorias
+              <button class="btn-icon-sm" onclick="openCategoryModal()" title="Nova categoria">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </span>
+            <div id="categories-list"></div>
+          </div>
+
+          <div class="nav-section">
+            <span class="nav-label">Etiquetas</span>
+            <div id="tags-list" class="tags-cloud"></div>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="main-content" id="main-content">
+
+        <!-- DASHBOARD STATS -->
+        <div class="dashboard-stats" id="dashboard-stats">
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fa-solid fa-note-sticky"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="stat-total">0</span>
+              <span class="stat-label">Total de notas</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon star"><i class="fa-solid fa-star"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="stat-favorites">0</span>
+              <span class="stat-label">Favoritas</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon archive"><i class="fa-solid fa-clock-rotate-left"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="stat-last-edit">—</span>
+              <span class="stat-label">Última edição</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon access"><i class="fa-solid fa-calendar-check"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="stat-last-access">—</span>
+              <span class="stat-label">Último acesso</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- NOTES TOOLBAR -->
+        <div class="notes-toolbar">
+          <div class="toolbar-left">
+            <h2 class="section-title" id="section-title">Todas as notas</h2>
+          </div>
+          <div class="toolbar-right">
+            <select class="sort-select" onchange="setSort(this.value)" title="Ordenar">
+              <option value="updatedAt-desc">Mais recentes</option>
+              <option value="updatedAt-asc">Mais antigas</option>
+              <option value="title-asc">A → Z</option>
+              <option value="title-desc">Z → A</option>
+            </select>
+            <div class="view-toggle">
+              <button class="btn-icon active" id="view-grid" onclick="setView('grid')" title="Grade">
+                <i class="fa-solid fa-grip"></i>
+              </button>
+              <button class="btn-icon" id="view-list" onclick="setView('list')" title="Lista">
+                <i class="fa-solid fa-list"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- NOTES GRID -->
+        <div class="notes-grid" id="notes-grid"></div>
+
+        <!-- EMPTY STATE -->
+        <div class="empty-state hidden" id="empty-state">
+          <div class="empty-icon"><i class="fa-solid fa-pen-to-square"></i></div>
+          <h3>Nenhuma nota encontrada</h3>
+          <p>Crie sua primeira nota para começar a organizar suas ideias.</p>
+          <button class="btn-primary" onclick="openNoteEditor(null)"><i class="fa-solid fa-plus"></i> Nova Nota</button>
+        </div>
+
+        <!-- LOADER -->
+        <div class="content-loader hidden" id="content-loader">
+          <div class="spinner"></div>
+          <span>Carregando notas…</span>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ NOTE EDITOR MODAL ═══════════════════════════════ -->
+  <div class="modal-overlay hidden" id="editor-overlay" onclick="handleOverlayClick(event)">
+    <div class="editor-modal" id="editor-modal">
+      <div class="editor-header">
+        <input type="text" class="editor-title" id="editor-title" placeholder="Título da nota…" maxlength="150" />
+        <div class="editor-actions">
+          <span class="autosave-indicator" id="autosave-indicator"><i class="fa-solid fa-circle-check"></i> Salvo</span>
+          <button class="btn-icon" onclick="exportNotePDF()" title="Exportar PDF"><i class="fa-solid fa-file-pdf"></i></button>
+          <button class="btn-icon" onclick="exportNoteTXT()" title="Exportar TXT"><i class="fa-solid fa-file-lines"></i></button>
+          <button class="btn-icon" onclick="duplicateCurrentNote()" title="Duplicar nota"><i class="fa-solid fa-copy"></i></button>
+          <button class="btn-icon" onclick="closeEditor()" title="Fechar (Esc)"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+
+      <div class="editor-meta">
+        <div class="meta-group">
+          <label><i class="fa-solid fa-folder"></i> Categoria</label>
+          <select id="editor-category">
+            <option value="">Sem categoria</option>
+          </select>
+        </div>
+        <div class="meta-group">
+          <label><i class="fa-solid fa-palette"></i> Cor</label>
+          <div class="color-picker" id="color-picker">
+            <button class="color-swatch active" data-color="#ffffff" style="background:#ffffff" onclick="setNoteColor('#ffffff', this)"></button>
+            <button class="color-swatch" data-color="#fef3c7" style="background:#fef3c7" onclick="setNoteColor('#fef3c7', this)"></button>
+            <button class="color-swatch" data-color="#dcfce7" style="background:#dcfce7" onclick="setNoteColor('#dcfce7', this)"></button>
+            <button class="color-swatch" data-color="#dbeafe" style="background:#dbeafe" onclick="setNoteColor('#dbeafe', this)"></button>
+            <button class="color-swatch" data-color="#fce7f3" style="background:#fce7f3" onclick="setNoteColor('#fce7f3', this)"></button>
+            <button class="color-swatch" data-color="#ede9fe" style="background:#ede9fe" onclick="setNoteColor('#ede9fe', this)"></button>
+            <button class="color-swatch" data-color="#fee2e2" style="background:#fee2e2" onclick="setNoteColor('#fee2e2', this)"></button>
+            <button class="color-swatch" data-color="#f1f5f9" style="background:#f1f5f9" onclick="setNoteColor('#f1f5f9', this)"></button>
+          </div>
+        </div>
+        <div class="meta-group">
+          <label><i class="fa-solid fa-tag"></i> Tags</label>
+          <div class="tags-input-wrap">
+            <div class="tags-input" id="tags-input"></div>
+            <input type="text" id="tag-input" placeholder="+ Adicionar tag" onkeydown="handleTagInput(event)" />
+          </div>
+        </div>
+        <div class="meta-actions">
+          <button class="btn-meta" id="btn-favorite" onclick="toggleEditorFavorite()" title="Favoritar">
+            <i class="fa-regular fa-star"></i>
+          </button>
+          <button class="btn-meta" id="btn-archive" onclick="toggleEditorArchive()" title="Arquivar">
+            <i class="fa-solid fa-box-archive"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- RICH TEXT TOOLBAR -->
+      <div class="editor-toolbar">
+        <div class="toolbar-group">
+          <select onchange="execCmd('formatBlock', this.value); this.value=''" title="Estilo de texto">
+            <option value="">Estilo</option>
+            <option value="h1">Título 1</option>
+            <option value="h2">Título 2</option>
+            <option value="h3">Título 3</option>
+            <option value="p">Parágrafo</option>
+          </select>
+        </div>
+        <div class="toolbar-group">
+          <button class="toolbar-btn" onclick="execCmd('bold')" title="Negrito (Ctrl+B)"><i class="fa-solid fa-bold"></i></button>
+          <button class="toolbar-btn" onclick="execCmd('italic')" title="Itálico (Ctrl+I)"><i class="fa-solid fa-italic"></i></button>
+          <button class="toolbar-btn" onclick="execCmd('underline')" title="Sublinhado (Ctrl+U)"><i class="fa-solid fa-underline"></i></button>
+          <button class="toolbar-btn" onclick="execCmd('strikeThrough')" title="Tachado"><i class="fa-solid fa-strikethrough"></i></button>
+        </div>
+        <div class="toolbar-group">
+          <button class="toolbar-btn" onclick="execCmd('justifyLeft')" title="Alinhar à esquerda"><i class="fa-solid fa-align-left"></i></button>
+          <button class="toolbar-btn" onclick="execCmd('justifyCenter')" title="Centralizar"><i class="fa-solid fa-align-center"></i></button>
+          <button class="toolbar-btn" onclick="execCmd('justifyRight')" title="Alinhar à direita"><i class="fa-solid fa-align-right"></i></button>
+          <button class="toolbar-btn" onclick="execCmd('justifyFull')" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
+        </div>
+        <div class="toolbar-group">
+          <button class="toolbar-btn" onclick="execCmd('insertUnorderedList')" title="Lista com marcadores"><i class="fa-solid fa-list-ul"></i></button>
+          <button class="toolbar-btn" onclick="execCmd('insertOrderedList')" title="Lista numerada"><i class="fa-solid fa-list-ol"></i></button>
+          <button class="toolbar-btn" onclick="execCmd('indent')" title="Aumentar recuo"><i class="fa-solid fa-indent"></i></button>
+          <button class="toolbar-btn" onclick="execCmd('outdent')" title="Diminuir recuo"><i class="fa-solid fa-outdent"></i></button>
+        </div>
+        <div class="toolbar-group">
+          <button class="toolbar-btn" onclick="insertLink()" title="Inserir link"><i class="fa-solid fa-link"></i></button>
+          <button class="toolbar-btn" onclick="insertImage()" title="Inserir imagem"><i class="fa-solid fa-image"></i></button>
+          <button class="toolbar-btn" onclick="execCmd('removeFormat')" title="Limpar formatação"><i class="fa-solid fa-eraser"></i></button>
+        </div>
+        <div class="toolbar-group ml-auto">
+          <span class="word-count" id="word-count">0 palavras · 0 chars</span>
+        </div>
+      </div>
+
+      <!-- EDITOR AREA -->
+      <div class="editor-body" id="editor-body" contenteditable="true" spellcheck="true"
+           oninput="onEditorInput()" placeholder="Comece a escrever sua nota…"></div>
+
+      <!-- HISTORY PANEL -->
+      <div class="editor-footer">
+        <div class="editor-dates" id="editor-dates"></div>
+        <button class="btn-link" onclick="toggleHistory()" id="btn-history"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</button>
+      </div>
+      <div class="history-panel hidden" id="history-panel">
+        <div class="history-header"><strong>Histórico de alterações</strong></div>
+        <div class="history-list" id="history-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ CATEGORY MODAL ═══════════════════════════════ -->
+  <div class="modal-overlay hidden" id="category-overlay" onclick="if(event.target===this)closeCategoryModal()">
+    <div class="simple-modal">
+      <div class="simple-modal-header">
+        <h3><i class="fa-solid fa-folder-plus"></i> Nova Categoria</h3>
+        <button class="btn-icon" onclick="closeCategoryModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="form-group">
+        <label>Nome da categoria</label>
+        <input type="text" id="category-name" placeholder="Ex: Trabalho, Pessoal…" onkeydown="if(event.key==='Enter')saveCategory()" />
+      </div>
+      <div class="form-group">
+        <label>Ícone</label>
+        <div class="icon-picker" id="icon-picker">
+          <button class="icon-opt active" data-icon="fa-folder" onclick="selectIcon('fa-folder', this)"><i class="fa-solid fa-folder"></i></button>
+          <button class="icon-opt" data-icon="fa-briefcase" onclick="selectIcon('fa-briefcase', this)"><i class="fa-solid fa-briefcase"></i></button>
+          <button class="icon-opt" data-icon="fa-house" onclick="selectIcon('fa-house', this)"><i class="fa-solid fa-house"></i></button>
+          <button class="icon-opt" data-icon="fa-heart" onclick="selectIcon('fa-heart', this)"><i class="fa-solid fa-heart"></i></button>
+          <button class="icon-opt" data-icon="fa-graduation-cap" onclick="selectIcon('fa-graduation-cap', this)"><i class="fa-solid fa-graduation-cap"></i></button>
+          <button class="icon-opt" data-icon="fa-flask" onclick="selectIcon('fa-flask', this)"><i class="fa-solid fa-flask"></i></button>
+          <button class="icon-opt" data-icon="fa-music" onclick="selectIcon('fa-music', this)"><i class="fa-solid fa-music"></i></button>
+          <button class="icon-opt" data-icon="fa-gamepad" onclick="selectIcon('fa-gamepad', this)"><i class="fa-solid fa-gamepad"></i></button>
+          <button class="icon-opt" data-icon="fa-camera" onclick="selectIcon('fa-camera', this)"><i class="fa-solid fa-camera"></i></button>
+          <button class="icon-opt" data-icon="fa-book" onclick="selectIcon('fa-book', this)"><i class="fa-solid fa-book"></i></button>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeCategoryModal()">Cancelar</button>
+        <button class="btn-primary" onclick="saveCategory()"><i class="fa-solid fa-check"></i> Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ CONFIRM MODAL ═══════════════════════════════ -->
+  <div class="modal-overlay hidden" id="confirm-overlay">
+    <div class="simple-modal confirm-modal">
+      <div class="confirm-icon" id="confirm-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <h3 id="confirm-title">Confirmar ação</h3>
+      <p id="confirm-message">Tem certeza que deseja continuar?</p>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="confirm-cancel">Cancelar</button>
+        <button class="btn-danger" id="confirm-ok">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ SHORTCUTS MODAL ═══════════════════════════════ -->
+  <div class="modal-overlay hidden" id="shortcuts-overlay" onclick="if(event.target===this)document.getElementById('shortcuts-overlay').classList.add('hidden')">
+    <div class="simple-modal shortcuts-modal">
+      <div class="simple-modal-header">
+        <h3><i class="fa-solid fa-keyboard"></i> Atalhos de Teclado</h3>
+        <button class="btn-icon" onclick="document.getElementById('shortcuts-overlay').classList.add('hidden')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="shortcuts-grid">
+        <div class="shortcut-item"><kbd>Ctrl+N</kbd><span>Nova nota</span></div>
+        <div class="shortcut-item"><kbd>Ctrl+K</kbd><span>Pesquisar</span></div>
+        <div class="shortcut-item"><kbd>Ctrl+B</kbd><span>Toggle sidebar</span></div>
+        <div class="shortcut-item"><kbd>Ctrl+D</kbd><span>Alternar tema</span></div>
+        <div class="shortcut-item"><kbd>Ctrl+S</kbd><span>Salvar nota</span></div>
+        <div class="shortcut-item"><kbd>Esc</kbd><span>Fechar editor</span></div>
+        <div class="shortcut-item"><kbd>Ctrl+B</kbd><span>Negrito</span></div>
+        <div class="shortcut-item"><kbd>Ctrl+I</kbd><span>Itálico</span></div>
+        <div class="shortcut-item"><kbd>Ctrl+U</kbd><span>Sublinhado</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- GLOBAL LOADER -->
+  <div class="global-loader hidden" id="global-loader">
+    <div class="spinner lg"></div>
+  </div>
+
+  <!-- Firebase SDK (compat – funciona com file:// e GitHub Pages) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script>
+// ══════════════════════════════════════════════════════════════
+//  NoteFlow – Firebase Configuration (compat API)
+//  Funciona com file://, localhost e GitHub Pages
+// ══════════════════════════════════════════════════════════════
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBdNskiWh4HljpcGNt3lQ79DS90Ya__pxg",
+  authDomain: "bloco-notas-3f79d.firebaseapp.com",
+  projectId: "bloco-notas-3f79d",
+  storageBucket: "bloco-notas-3f79d.firebasestorage.app",
+  messagingSenderId: "846966691548",
+  appId: "1:846966691548:web:375505eb978ddde7a14619"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth           = firebase.auth();
+const db             = firebase.firestore();
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+  </script>
+  <script>
+// ══════════════════════════════════════════════════════════════
+//  NoteFlow – Main Application (compat API, no ES modules)
+// ══════════════════════════════════════════════════════════════
+// Depende de: firebase-app-compat, firebase-auth-compat,
+//             firebase-firestore-compat, firebase-config.js
+
+// ──────────────────────────────────────────────────────────────
+//  STATE
+// ──────────────────────────────────────────────────────────────
+let currentUser    = null;
+let notes          = [];
+let categories     = [];
+let allTags        = new Set();
+let currentFilter  = "all";
+let currentSort    = "updatedAt-desc";
+let currentView    = "grid";
+let searchQuery    = "";
+let activeTag      = null;
+let notesUnsubscribe = null;
+let catsUnsubscribe  = null;
+
+// Editor state
+let editorNoteId   = null;
+let editorNoteData = {};
+let editorTags     = [];
+let editorColor    = "#ffffff";
+let autosaveTimer  = null;
+let historyEntries = [];
+
+// ──────────────────────────────────────────────────────────────
+//  AUTH LISTENERS
+// ──────────────────────────────────────────────────────────────
+auth.onAuthStateChanged(function(user) {
+  if (user) {
+    currentUser = user;
+    document.getElementById("auth-screen").classList.add("hidden");
+    document.getElementById("app-screen").classList.remove("hidden");
+    initApp();
+  } else {
+    currentUser = null;
+    document.getElementById("auth-screen").classList.remove("hidden");
+    document.getElementById("app-screen").classList.add("hidden");
+    if (notesUnsubscribe) notesUnsubscribe();
+    if (catsUnsubscribe)  catsUnsubscribe();
+  }
+});
+
+// ──────────────────────────────────────────────────────────────
+//  AUTH ACTIONS
+// ──────────────────────────────────────────────────────────────
+function showPanel(panel) {
+  document.querySelectorAll(".auth-panel").forEach(function(p) {
+    p.classList.remove("active");
+  });
+  document.getElementById(panel + "-panel").classList.add("active");
+}
+
+function togglePassword(id, btn) {
+  var input  = document.getElementById(id);
+  var isText = input.type === "text";
+  input.type = isText ? "password" : "text";
+  btn.innerHTML = '<i class="fa-solid fa-eye' + (isText ? '' : '-slash') + '"></i>';
+}
+
+function handleLogin() {
+  var email = document.getElementById("login-email").value.trim();
+  var pass  = document.getElementById("login-password").value;
+  if (!email || !pass) return toast("Preencha todos os campos", "warning");
+  showGlobalLoader();
+  auth.signInWithEmailAndPassword(email, pass)
+    .then(function() { toast("Bem-vindo de volta!", "success"); })
+    .catch(function(e) { toast(firebaseError(e), "error"); })
+    .finally(hideGlobalLoader);
+}
+
+function handleRegister() {
+  var name  = document.getElementById("reg-name").value.trim();
+  var email = document.getElementById("reg-email").value.trim();
+  var pass  = document.getElementById("reg-password").value;
+  if (!name || !email || !pass) return toast("Preencha todos os campos", "warning");
+  if (pass.length < 6) return toast("Senha deve ter no mínimo 6 caracteres", "warning");
+  showGlobalLoader();
+  auth.createUserWithEmailAndPassword(email, pass)
+    .then(function(cred) { return cred.user.updateProfile({ displayName: name }); })
+    .then(function() { toast("Conta criada com sucesso!", "success"); })
+    .catch(function(e) { toast(firebaseError(e), "error"); })
+    .finally(hideGlobalLoader);
+}
+
+function handleGoogleLogin() {
+  showGlobalLoader();
+  auth.signInWithPopup(googleProvider)
+    .then(function() { toast("Login com Google realizado!", "success"); })
+    .catch(function(e) { toast(firebaseError(e), "error"); })
+    .finally(hideGlobalLoader);
+}
+
+function handleForgotPassword() {
+  var email = document.getElementById("forgot-email").value.trim();
+  if (!email) return toast("Informe seu e-mail", "warning");
+  showGlobalLoader();
+  auth.sendPasswordResetEmail(email)
+    .then(function() { toast("Link enviado! Verifique seu e-mail.", "success"); showPanel("login"); })
+    .catch(function(e) { toast(firebaseError(e), "error"); })
+    .finally(hideGlobalLoader);
+}
+
+function handleLogout() {
+  auth.signOut().then(function() { toast("Até logo!", "info"); });
+}
+
+// ──────────────────────────────────────────────────────────────
+//  APP INIT
+// ──────────────────────────────────────────────────────────────
+function initApp() {
+  updateUserUI();
+  loadTheme();
+  runFirestoreDiagnostic(); // testa permissões antes de subscrever
+  subscribeNotes();
+  subscribeCategories();
+  document.getElementById("stat-last-access").textContent = formatDate(new Date());
+  setupKeyboardShortcuts();
+}
+
+// ─── Diagnóstico de Firestore ──────────────────────────────────
+// Tenta gravar e ler um documento de teste para detectar problemas
+// de regras, índice ou configuração antes que afetem o usuário.
+function runFirestoreDiagnostic() {
+  var testRef = db.collection("notes").doc("__diag_" + currentUser.uid);
+
+  // Tenta escrever
+  testRef.set({
+    uid: currentUser.uid,
+    _diagnostic: true,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  })
+  .then(function() {
+    // Escrita OK — remove o doc de teste
+    return testRef.delete();
+  })
+  .then(function() {
+    console.log("✅ Firestore: leitura/escrita funcionando corretamente.");
+  })
+  .catch(function(err) {
+    console.error("❌ Firestore diagnóstico falhou:", err.code, err.message);
+    if (err.code === "permission-denied") {
+      toast(
+        "⛔ Firestore: permissão negada! Cole as regras de segurança no Firebase Console.",
+        "error", 12000
+      );
+      console.error(
+        "\n⛔ REGRAS DO FIRESTORE INCORRETAS.\n" +
+        "Acesse: https://console.firebase.google.com/project/bloco-notas-3f79d/firestore/rules\n" +
+        "E cole as regras do arquivo firestore.rules\n"
+      );
+    } else if (err.code === "unavailable" || err.code === "failed-precondition") {
+      toast("⚠️ Firestore indisponível. Verifique sua conexão.", "warning", 8000);
+    } else {
+      console.warn("Diagnóstico Firestore:", err.code, err.message);
+    }
+  });
+}
+
+function updateUserUI() {
+  var name  = currentUser.displayName || currentUser.email.split("@")[0];
+  var email = currentUser.email;
+  document.getElementById("user-name-display").textContent = name;
+  document.getElementById("user-email-display").textContent = email;
+  document.getElementById("user-avatar").textContent = name.charAt(0).toUpperCase();
+}
+
+// ──────────────────────────────────────────────────────────────
+//  REALTIME SUBSCRIPTIONS
+// ──────────────────────────────────────────────────────────────
+function processNotesSnapshot(snap) {
+  notes = snap.docs.map(function(d) { return Object.assign({ id: d.id }, d.data()); });
+  // Ordena localmente para não depender de índice
+  notes.sort(function(a, b) {
+    var da = a.updatedAt && a.updatedAt.toDate ? a.updatedAt.toDate() : new Date(0);
+    var db2 = b.updatedAt && b.updatedAt.toDate ? b.updatedAt.toDate() : new Date(0);
+    return db2 - da;
+  });
+  allTags = new Set(notes.flatMap(function(n) { return n.tags || []; }));
+  document.getElementById("content-loader").classList.add("hidden");
+  updateBadges();
+  updateStats();
+  renderTagsCloud();
+  renderNotes();
+}
+
+function subscribeNotes() {
+  document.getElementById("content-loader").classList.remove("hidden");
+  document.getElementById("notes-grid").innerHTML = "";
+
+  // Tenta query com orderBy (requer índice composto no Firestore)
+  // Se falhar por falta de índice, cai no fallback sem orderBy
+  notesUnsubscribe = db.collection("notes")
+    .where("uid", "==", currentUser.uid)
+    .orderBy("updatedAt", "desc")
+    .onSnapshot(processNotesSnapshot, function(err) {
+      console.error("Query com orderBy falhou:", err.code, err.message);
+
+      if (err.code === "failed-precondition") {
+        // Índice não existe: extrai link e usa fallback simples
+        var link = (err.message || "").match(/https:\/\/[^\s]+/);
+        if (link) {
+          console.warn("\n⚠️  ÍNDICE NECESSÁRIO. Clique para criar automaticamente:\n" + link[0] + "\n");
+          toast("⚠️ Índice do Firestore necessário — veja o console (F12)", "warning", 10000);
+        }
+        // Fallback: busca sem orderBy (ordena no client)
+        if (notesUnsubscribe) notesUnsubscribe();
+        notesUnsubscribe = db.collection("notes")
+          .where("uid", "==", currentUser.uid)
+          .onSnapshot(processNotesSnapshot, function(err2) {
+            console.error("Fallback também falhou:", err2);
+            toast("Erro ao carregar notas: " + (err2.code || err2.message), "error");
+            document.getElementById("content-loader").classList.add("hidden");
+          });
+      } else if (err.code === "permission-denied") {
+        toast("Permissão negada — verifique as regras do Firestore", "error", 8000);
+        document.getElementById("content-loader").classList.add("hidden");
+      } else {
+        toast("Erro ao carregar notas: " + (err.code || err.message), "error");
+        document.getElementById("content-loader").classList.add("hidden");
+      }
+    });
+}
+
+function subscribeCategories() {
+  function processCatsSnapshot(snap) {
+    categories = snap.docs.map(function(d) { return Object.assign({ id: d.id }, d.data()); });
+    categories.sort(function(a, b) { return (a.name || "").localeCompare(b.name || ""); });
+    renderCategoriesSidebar();
+    updateEditorCategorySelect();
+  }
+
+  catsUnsubscribe = db.collection("categories")
+    .where("uid", "==", currentUser.uid)
+    .orderBy("name", "asc")
+    .onSnapshot(processCatsSnapshot, function(err) {
+      console.warn("Categories orderBy falhou, usando fallback:", err.code);
+      if (catsUnsubscribe) catsUnsubscribe();
+      catsUnsubscribe = db.collection("categories")
+        .where("uid", "==", currentUser.uid)
+        .onSnapshot(processCatsSnapshot, function(err2) {
+          console.error("Categories fallback falhou:", err2);
+        });
+    });
+}
+
+// ──────────────────────────────────────────────────────────────
+//  RENDER NOTES
+// ──────────────────────────────────────────────────────────────
+function getFilteredNotes() {
+  var list = notes.slice();
+
+  switch (currentFilter) {
+    case "favorites": list = list.filter(function(n) { return n.favorite && !n.trash; }); break;
+    case "archived":  list = list.filter(function(n) { return n.archived && !n.trash; }); break;
+    case "trash":     list = list.filter(function(n) { return n.trash; }); break;
+    default:
+      if (currentFilter.startsWith("cat:")) {
+        var catId = currentFilter.replace("cat:", "");
+        list = list.filter(function(n) { return n.categoryId === catId && !n.trash; });
+      } else {
+        list = list.filter(function(n) { return !n.trash && !n.archived; });
+      }
+  }
+
+  if (activeTag) {
+    list = list.filter(function(n) { return (n.tags || []).includes(activeTag); });
+  }
+
+  if (searchQuery.trim()) {
+    var q = searchQuery.toLowerCase();
+    list = list.filter(function(n) {
+      return (n.title || "").toLowerCase().includes(q) ||
+             (n.content || "").toLowerCase().replace(/<[^>]+>/g, "").includes(q) ||
+             (n.categoryName || "").toLowerCase().includes(q) ||
+             (n.tags || []).some(function(t) { return t.toLowerCase().includes(q); });
+    });
+  }
+
+  var parts = currentSort.split("-");
+  var field = parts[0], dir = parts[1];
+  list.sort(function(a, b) {
+    var va = a[field], vb = b[field];
+    if (va && va.toDate) va = va.toDate();
+    if (vb && vb.toDate) vb = vb.toDate();
+    if (typeof va === "string") va = va.toLowerCase();
+    if (typeof vb === "string") vb = vb.toLowerCase();
+    if (va < vb) return dir === "asc" ? -1 : 1;
+    if (va > vb) return dir === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  return list;
+}
+
+function renderNotes() {
+  var grid  = document.getElementById("notes-grid");
+  var empty = document.getElementById("empty-state");
+  var list  = getFilteredNotes();
+
+  grid.innerHTML = "";
+  grid.className = "notes-grid" + (currentView === "list" ? " list-view" : "");
+
+  if (!list.length) { empty.classList.remove("hidden"); return; }
+  empty.classList.add("hidden");
+
+  list.forEach(function(note) { grid.appendChild(buildNoteCard(note)); });
+}
+
+function buildNoteCard(note) {
+  var card = document.createElement("div");
+  card.className = "note-card";
+  if (note.color && note.color !== "#ffffff") card.style.background = note.color;
+
+  card.onclick = function(e) {
+    if (!e.target.closest(".note-action-btn")) openNoteEditor(note);
+  };
+
+  var plainText = (note.content || "").replace(/<[^>]+>/g, "");
+  var catName   = note.categoryName || "";
+  var catIcon   = note.categoryIcon || "fa-folder";
+  var tags      = note.tags || [];
+  var updAt     = note.updatedAt && note.updatedAt.toDate ? note.updatedAt.toDate() : new Date();
+
+  var trashBtns = note.trash
+    ? '<button class="note-action-btn" onclick="restoreNote(\'' + note.id + '\')" title="Restaurar"><i class="fa-solid fa-trash-arrow-up"></i></button>' +
+      '<button class="note-action-btn danger" onclick="confirmDelete(\'' + note.id + '\')" title="Excluir definitivamente"><i class="fa-solid fa-trash"></i></button>'
+    : '<button class="note-action-btn danger" onclick="moveToTrash(\'' + note.id + '\')" title="Lixeira"><i class="fa-solid fa-trash"></i></button>';
+
+  card.innerHTML =
+    '<div class="note-card-header">' +
+      '<div class="note-card-title">' + highlight(note.title || "Sem título") + '</div>' +
+      '<div class="note-card-actions">' +
+        '<button class="note-action-btn' + (note.favorite ? " active" : "") + '" onclick="toggleFavorite(\'' + note.id + '\',' + !!note.favorite + ')" title="Favoritar">' +
+          '<i class="fa-' + (note.favorite ? "solid" : "regular") + ' fa-star"></i></button>' +
+        '<button class="note-action-btn" onclick="archiveNote(\'' + note.id + '\',' + !!note.archived + ')" title="Arquivar">' +
+          '<i class="fa-solid fa-box-archive"></i></button>' +
+        trashBtns +
+      '</div>' +
+    '</div>' +
+    '<div class="note-card-body">' + (highlight(plainText.slice(0, 300)) || '<span style="opacity:.4">Nota vazia</span>') + '</div>' +
+    '<div class="note-card-footer">' +
+      (catName ? '<span class="note-category-badge"><i class="fa-solid ' + catIcon + '"></i> ' + escHtml(catName) + '</span>' : '') +
+      tags.slice(0, 3).map(function(t) { return '<span class="note-tag-badge">#' + escHtml(t) + '</span>'; }).join("") +
+      '<span class="note-date">' + timeAgo(updAt) + '</span>' +
+    '</div>';
+
+  return card;
+}
+
+function highlight(text) {
+  if (!searchQuery.trim()) return escHtml(text);
+  var re = new RegExp("(" + escRegex(searchQuery) + ")", "gi");
+  return escHtml(text).replace(re, '<mark class="highlight">$1</mark>');
+}
+
+// ──────────────────────────────────────────────────────────────
+//  BADGES & STATS
+// ──────────────────────────────────────────────────────────────
+function updateBadges() {
+  var active   = notes.filter(function(n) { return !n.trash && !n.archived; });
+  var favs     = notes.filter(function(n) { return n.favorite && !n.trash; });
+  var archived = notes.filter(function(n) { return n.archived && !n.trash; });
+  var trash    = notes.filter(function(n) { return n.trash; });
+  document.getElementById("badge-all").textContent       = active.length;
+  document.getElementById("badge-favorites").textContent = favs.length;
+  document.getElementById("badge-archived").textContent  = archived.length;
+  document.getElementById("badge-trash").textContent     = trash.length;
+}
+
+function updateStats() {
+  var active = notes.filter(function(n) { return !n.trash; });
+  document.getElementById("stat-total").textContent     = active.length;
+  document.getElementById("stat-favorites").textContent = active.filter(function(n) { return n.favorite; }).length;
+  var sorted = active.slice().sort(function(a, b) {
+    var da = a.updatedAt && a.updatedAt.toDate ? a.updatedAt.toDate() : 0;
+    var db2 = b.updatedAt && b.updatedAt.toDate ? b.updatedAt.toDate() : 0;
+    return db2 - da;
+  });
+  if (sorted[0] && sorted[0].updatedAt) {
+    document.getElementById("stat-last-edit").textContent = timeAgo(sorted[0].updatedAt.toDate());
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
+//  CATEGORIES
+// ──────────────────────────────────────────────────────────────
+function renderCategoriesSidebar() {
+  var list = document.getElementById("categories-list");
+  list.innerHTML = "";
+  categories.forEach(function(cat) {
+    var el = document.createElement("div");
+    el.className = "category-item" + (currentFilter === "cat:" + cat.id ? " active" : "");
+    el.innerHTML =
+      '<i class="fa-solid ' + (cat.icon || "fa-folder") + '"></i>' +
+      '<span>' + escHtml(cat.name) + '</span>' +
+      '<div class="cat-actions">' +
+        '<button class="btn-icon-sm" onclick="deleteCategory(\'' + cat.id + '\',event)" title="Remover"><i class="fa-solid fa-xmark"></i></button>' +
+      '</div>';
+    el.onclick = function(e) {
+      if (!e.target.closest(".cat-actions")) setFilter("cat:" + cat.id, el);
+    };
+    list.appendChild(el);
+  });
+}
+
+function renderTagsCloud() {
+  var container = document.getElementById("tags-list");
+  container.innerHTML = "";
+  allTags.forEach(function(tag) {
+    var el = document.createElement("span");
+    el.className = "tag-chip" + (activeTag === tag ? " active" : "");
+    el.textContent = "#" + tag;
+    el.onclick = function() {
+      activeTag = activeTag === tag ? null : tag;
+      renderTagsCloud();
+      renderNotes();
+    };
+    container.appendChild(el);
+  });
+}
+
+function updateEditorCategorySelect() {
+  var sel     = document.getElementById("editor-category");
+  var current = sel.value;
+  sel.innerHTML = '<option value="">Sem categoria</option>';
+  categories.forEach(function(cat) {
+    var opt = document.createElement("option");
+    opt.value       = cat.id;
+    opt.textContent = cat.name;
+    sel.appendChild(opt);
+  });
+  if (current) sel.value = current;
+}
+
+var selectedIcon = "fa-folder";
+
+function openCategoryModal() {
+  document.getElementById("category-name").value = "";
+  selectedIcon = "fa-folder";
+  document.querySelectorAll(".icon-opt").forEach(function(b) { b.classList.remove("active"); });
+  document.querySelector('.icon-opt[data-icon="fa-folder"]').classList.add("active");
+  document.getElementById("category-overlay").classList.remove("hidden");
+  setTimeout(function() { document.getElementById("category-name").focus(); }, 100);
+}
+
+function closeCategoryModal() { document.getElementById("category-overlay").classList.add("hidden"); }
+
+function selectIcon(icon, btn) {
+  selectedIcon = icon;
+  document.querySelectorAll(".icon-opt").forEach(function(b) { b.classList.remove("active"); });
+  btn.classList.add("active");
+}
+
+function saveCategory() {
+  var name = document.getElementById("category-name").value.trim();
+  if (!name) return toast("Informe o nome da categoria", "warning");
+  db.collection("categories").add({ uid: currentUser.uid, name: name, icon: selectedIcon })
+    .then(function() { toast("Categoria criada!", "success"); closeCategoryModal(); })
+    .catch(function() { toast("Erro ao criar categoria", "error"); });
+}
+
+function deleteCategory(id, e) {
+  if (e) e.stopPropagation();
+  confirm2("Excluir categoria?", "As notas não serão excluídas.", function() {
+    db.collection("categories").doc(id).delete();
+    if (currentFilter === "cat:" + id) setFilter("all");
+    toast("Categoria removida", "info");
+  });
+}
+
+// ──────────────────────────────────────────────────────────────
+//  NOTE EDITOR
+// ──────────────────────────────────────────────────────────────
+function openNoteEditor(note) {
+  editorNoteId   = note ? note.id : null;
+  editorNoteData = note ? Object.assign({}, note) : {};
+  editorTags     = note && note.tags ? note.tags.slice() : [];
+  editorColor    = note && note.color ? note.color : "#ffffff";
+  historyEntries = note && note.history ? note.history.slice() : [];
+  lastHistoryTs  = 0; // reset para permitir entrada de histórico na próxima edição
+
+  document.getElementById("editor-title").value    = note ? (note.title || "") : "";
+  document.getElementById("editor-body").innerHTML = note ? (note.content || "") : "";
+  document.getElementById("editor-category").value = note ? (note.categoryId || "") : "";
+  document.getElementById("editor-overlay").classList.remove("hidden");
+  document.getElementById("editor-modal").style.background = "";
+
+  document.querySelectorAll(".color-swatch").forEach(function(s) {
+    s.classList.toggle("active", s.dataset.color === editorColor);
+  });
+
+  renderEditorTags();
+  updateMetaButtons();
+
+  var created = note && note.createdAt && note.createdAt.toDate ? note.createdAt.toDate() : null;
+  var updated = note && note.updatedAt && note.updatedAt.toDate ? note.updatedAt.toDate() : null;
+  document.getElementById("editor-dates").innerHTML = note
+    ? '<span>Criado: ' + (created ? formatDateFull(created) : "—") + '</span>' +
+      '<span style="margin-left:12px">Editado: ' + (updated ? formatDateFull(updated) : "—") + '</span>'
+    : "";
+
+  document.getElementById("history-panel").classList.add("hidden");
+  updateWordCount();
+  updateAutosaveStatus("saved");
+  renderHistory();
+
+  setTimeout(function() {
+    document.getElementById(note ? "editor-body" : "editor-title").focus();
+  }, 100);
+}
+
+function closeEditor() {
+  clearTimeout(autosaveTimer);
+  document.getElementById("editor-overlay").classList.add("hidden");
+  editorNoteId = null;
+  document.getElementById("history-panel").classList.add("hidden");
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById("editor-overlay")) closeEditor();
+}
+
+// ─── Toolbar ─────────────────────────────────────────────────
+function execCmd(cmd, value) {
+  document.getElementById("editor-body").focus();
+  document.execCommand(cmd, false, value || null);
+  onEditorInput();
+}
+
+function insertLink() {
+  var url = prompt("URL do link:");
+  if (url) execCmd("createLink", url);
+}
+
+function insertImage() {
+  var url = prompt("URL da imagem:");
+  if (url) execCmd("insertImage", url);
+}
+
+function onEditorInput() {
+  updateWordCount();
+  updateAutosaveStatus("saving");
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(function() {
+    if (currentUser) saveNote();
+  }, 3000); // 3s debounce – evita salvar a cada tecla
+}
+
+function updateWordCount() {
+  var body  = document.getElementById("editor-body");
+  var text  = body.innerText || "";
+  var words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  document.getElementById("word-count").textContent = words + " palavras · " + text.length + " chars";
+}
+
+function updateAutosaveStatus(state) {
+  var el = document.getElementById("autosave-indicator");
+  if (state === "saving") {
+    el.className = "autosave-indicator saving";
+    el.innerHTML = '<i class="fa-solid fa-rotate"></i> Salvando…';
+  } else {
+    el.className = "autosave-indicator";
+    el.innerHTML = '<i class="fa-solid fa-circle-check"></i> Salvo';
+  }
+}
+
+// ─── Tags ─────────────────────────────────────────────────────
+function handleTagInput(e) {
+  if (e.key === "Enter" || e.key === ",") {
+    e.preventDefault();
+    var val = e.target.value.trim().toLowerCase().replace(/,/g, "");
+    if (val && !editorTags.includes(val)) { editorTags.push(val); renderEditorTags(); }
+    e.target.value = "";
+  }
+}
+
+function renderEditorTags() {
+  document.getElementById("tags-input").innerHTML = editorTags.map(function(t) {
+    return '<span class="tag-pill">#' + escHtml(t) +
+      '<button onclick="removeTag(\'' + t + '\')"><i class="fa-solid fa-xmark"></i></button></span>';
+  }).join("");
+}
+
+function removeTag(tag) {
+  editorTags = editorTags.filter(function(t) { return t !== tag; });
+  renderEditorTags();
+}
+
+// ─── Color ────────────────────────────────────────────────────
+function setNoteColor(color, btn) {
+  editorColor = color;
+  document.querySelectorAll(".color-swatch").forEach(function(s) { s.classList.remove("active"); });
+  btn.classList.add("active");
+  document.getElementById("editor-modal").style.background = color !== "#ffffff" ? color : "";
+}
+
+// ─── Favorite / Archive in editor ────────────────────────────
+function toggleEditorFavorite() {
+  editorNoteData.favorite = !editorNoteData.favorite;
+  updateMetaButtons();
+  saveNote();
+}
+
+function toggleEditorArchive() {
+  editorNoteData.archived = !editorNoteData.archived;
+  updateMetaButtons();
+  saveNote();
+}
+
+function updateMetaButtons() {
+  var btnFav  = document.getElementById("btn-favorite");
+  var btnArch = document.getElementById("btn-archive");
+  btnFav.className  = "btn-meta" + (editorNoteData.favorite ? " active-fav" : "");
+  btnFav.innerHTML  = '<i class="fa-' + (editorNoteData.favorite ? "solid" : "regular") + ' fa-star"></i>';
+  btnArch.className = "btn-meta" + (editorNoteData.archived ? " active-arch" : "");
+}
+
+// ──────────────────────────────────────────────────────────────
+//  SAVE NOTE
+// ──────────────────────────────────────────────────────────────
+// Controla throttle do histórico: só grava versão se passaram ≥30s desde a última
+var lastHistoryTs = 0;
+
+function saveNote() {
+  // Guard: usuário precisa estar logado
+  if (!currentUser) return;
+
+  var title    = document.getElementById("editor-title").value.trim();
+  var content  = document.getElementById("editor-body").innerHTML;
+  var plainTxt = (document.getElementById("editor-body").innerText || "").trim();
+  var catId    = document.getElementById("editor-category").value;
+  var cat      = categories.find(function(c) { return c.id === catId; });
+
+  // Não salva nota completamente vazia
+  if (!title && !plainTxt) {
+    updateAutosaveStatus("saved");
+    return;
+  }
+
+  // Histórico: só adiciona versão se houver conteúdo e passaram ≥30s desde a última entrada
+  var now = Date.now();
+  if (plainTxt && (now - lastHistoryTs) > 30000) {
+    historyEntries.unshift({ content: content, ts: new Date().toISOString() });
+    if (historyEntries.length > 20) historyEntries = historyEntries.slice(0, 20);
+    lastHistoryTs = now;
+  }
+
+  var payload = {
+    uid:          currentUser.uid,
+    title:        title || "Sem título",
+    content:      content,
+    categoryId:   catId || null,
+    categoryName: cat ? cat.name : null,
+    categoryIcon: cat ? cat.icon : null,
+    color:        editorColor,
+    tags:         editorTags,
+    favorite:     !!editorNoteData.favorite,
+    archived:     !!editorNoteData.archived,
+    trash:        false,
+    history:      historyEntries,
+    updatedAt:    firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  var promise;
+  if (editorNoteId) {
+    // Atualiza nota existente
+    promise = db.collection("notes").doc(editorNoteId).update(payload);
+  } else {
+    // Cria nova nota — define createdAt apenas na criação
+    payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+    promise = db.collection("notes").add(payload).then(function(ref) {
+      editorNoteId = ref.id;
+      // Agora que temos o ID, força uma entrada no histórico
+      lastHistoryTs = Date.now();
+      historyEntries.unshift({ content: content, ts: new Date().toISOString() });
+      return db.collection("notes").doc(editorNoteId).update({ history: historyEntries });
+    });
+  }
+
+  promise
+    .then(function() {
+      updateAutosaveStatus("saved");
+      renderHistory();
+      // Atualiza datas no rodapé do editor
+      var now = new Date();
+      var datesEl = document.getElementById("editor-dates");
+      if (datesEl && editorNoteId) {
+        var created = editorNoteData.createdAt && editorNoteData.createdAt.toDate
+          ? editorNoteData.createdAt.toDate() : now;
+        datesEl.innerHTML =
+          '<span>Criado: ' + formatDateFull(created) + '</span>' +
+          '<span style="margin-left:12px">Editado: ' + formatDateFull(now) + '</span>';
+      }
+    })
+    .catch(function(e) {
+      console.error("saveNote error:", e);
+      // Erro de permissão — regras do Firestore
+      if (e.code === "permission-denied") {
+        toast("Permissão negada. Verifique as regras do Firestore.", "error", 6000);
+      }
+      // Índice faltando
+      else if (e.message && e.message.includes("index")) {
+        var link = e.message.match(/https:\/\/\S+/);
+        console.warn("Crie o índice:", link ? link[0] : "Firebase Console");
+        toast("Crie o índice no Firestore (veja o console)", "warning", 8000);
+      } else {
+        toast("Erro ao salvar: " + (e.message || e.code || "desconhecido"), "error");
+      }
+    });
+}
+
+// ──────────────────────────────────────────────────────────────
+//  NOTE ACTIONS
+// ──────────────────────────────────────────────────────────────
+function toggleFavorite(id, current) {
+  db.collection("notes").doc(id).update({ favorite: !current });
+  toast(!current ? "Nota favoritada!" : "Removida dos favoritos", "info");
+}
+
+function archiveNote(id, isArchived) {
+  db.collection("notes").doc(id).update({ archived: !isArchived, trash: false });
+  toast(!isArchived ? "Nota arquivada" : "Nota restaurada do arquivo", "info");
+}
+
+function moveToTrash(id) {
+  confirm2("Mover para lixeira?", "Você poderá restaurar a nota depois.", function() {
+    db.collection("notes").doc(id).update({ trash: true });
+    toast("Nota movida para a lixeira", "info");
+  });
+}
+
+function restoreNote(id) {
+  db.collection("notes").doc(id).update({ trash: false, archived: false });
+  toast("Nota restaurada!", "success");
+}
+
+function confirmDelete(id) {
+  confirm2("Excluir permanentemente?", "Esta ação não pode ser desfeita.", function() {
+    db.collection("notes").doc(id).delete();
+    toast("Nota excluída permanentemente", "info");
+  }, "Excluir");
+}
+
+function duplicateCurrentNote() {
+  if (!editorNoteId) return toast("Salve a nota antes de duplicar", "warning");
+  var payload = Object.assign({}, editorNoteData, {
+    title:     (editorNoteData.title || "Nota") + " (cópia)",
+    content:   document.getElementById("editor-body").innerHTML,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    trash:     false,
+    history:   []
+  });
+  delete payload.id;
+  db.collection("notes").add(payload).then(function() { toast("Nota duplicada!", "success"); });
+}
+
+// ──────────────────────────────────────────────────────────────
+//  HISTORY
+// ──────────────────────────────────────────────────────────────
+function toggleHistory() {
+  document.getElementById("history-panel").classList.toggle("hidden");
+}
+
+function renderHistory() {
+  var list = document.getElementById("history-list");
+  if (!historyEntries.length) {
+    list.innerHTML = '<div class="history-item"><span class="history-preview" style="opacity:.5">Nenhuma versão registrada</span></div>';
+    return;
+  }
+  list.innerHTML = historyEntries.map(function(h, i) {
+    return '<div class="history-item">' +
+      '<span class="history-time">' + formatDateFull(new Date(h.ts)) + '</span>' +
+      '<span class="history-preview">' + (h.content || "").replace(/<[^>]+>/g,"").slice(0,80) + '…</span>' +
+      '<span class="history-restore" onclick="restoreVersion(' + i + ')">Restaurar</span>' +
+    '</div>';
+  }).join("");
+}
+
+function restoreVersion(i) {
+  if (!historyEntries[i]) return;
+  document.getElementById("editor-body").innerHTML = historyEntries[i].content;
+  updateWordCount();
+  toast("Versão restaurada!", "success");
+}
+
+// ──────────────────────────────────────────────────────────────
+//  EXPORT
+// ──────────────────────────────────────────────────────────────
+function exportNotePDF() {
+  var title   = document.getElementById("editor-title").value || "nota";
+  var content = document.getElementById("editor-body").innerHTML;
+  var win = window.open("", "_blank");
+  win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + escHtml(title) + '</title>' +
+    '<style>body{font-family:Georgia,serif;max-width:700px;margin:40px auto;line-height:1.7;color:#1a1a1a}' +
+    'h1{margin-bottom:24px;border-bottom:2px solid #6366f1;padding-bottom:8px}</style></head><body>' +
+    '<h1>' + escHtml(title) + '</h1><div>' + content + '</div></body></html>');
+  win.document.close();
+  win.print();
+}
+
+function exportNoteTXT() {
+  var title   = document.getElementById("editor-title").value || "nota";
+  var content = document.getElementById("editor-body").innerText || "";
+  var sep     = "=".repeat(title.length);
+  var blob    = new Blob([title + "\n" + sep + "\n\n" + content], { type: "text/plain;charset=utf-8" });
+  var url     = URL.createObjectURL(blob);
+  var a       = document.createElement("a");
+  a.href = url; a.download = title.replace(/\s+/g,"_") + ".txt";
+  a.click(); URL.revokeObjectURL(url);
+  toast("Nota exportada como TXT!", "success");
+}
+
+// ──────────────────────────────────────────────────────────────
+//  FILTERS / SEARCH / SORT / VIEW
+// ──────────────────────────────────────────────────────────────
+function setFilter(filter, el) {
+  currentFilter = filter;
+  activeTag = null;
+  document.querySelectorAll(".nav-item").forEach(function(i) { i.classList.remove("active"); });
+  if (el) el.classList.add("active");
+
+  var titles = { all:"Todas as notas", favorites:"Favoritas", archived:"Arquivadas", trash:"Lixeira" };
+  var cat    = categories.find(function(c) { return "cat:" + c.id === filter; });
+  document.getElementById("section-title").textContent = cat ? cat.name : (titles[filter] || "Notas");
+
+  renderNotes();
+  renderCategoriesSidebar();
+  renderTagsCloud();
+}
+
+function handleSearch(val) { searchQuery = val; renderNotes(); }
+function setSort(val) { currentSort = val; renderNotes(); }
+
+function setView(view) {
+  currentView = view;
+  document.getElementById("view-grid").classList.toggle("active", view === "grid");
+  document.getElementById("view-list").classList.toggle("active", view === "list");
+  renderNotes();
+}
+
+// ──────────────────────────────────────────────────────────────
+//  THEME
+// ──────────────────────────────────────────────────────────────
+function loadTheme() {
+  var saved = localStorage.getItem("noteflow_theme") ||
+    (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  applyTheme(saved);
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  document.getElementById("theme-btn").innerHTML = '<i class="fa-solid fa-' + (theme === "dark" ? "sun" : "moon") + '"></i>';
+  localStorage.setItem("noteflow_theme", theme);
+}
+
+function toggleTheme() {
+  var current = document.documentElement.getAttribute("data-theme");
+  applyTheme(current === "dark" ? "light" : "dark");
+}
+
+// ──────────────────────────────────────────────────────────────
+//  SIDEBAR
+// ──────────────────────────────────────────────────────────────
+function toggleSidebar() {
+  var sidebar  = document.getElementById("sidebar");
+  var isMobile = window.innerWidth < 768;
+  sidebar.classList.toggle("collapsed");
+
+  if (isMobile) {
+    var overlay = document.getElementById("sidebar-overlay");
+    if (!overlay) {
+      overlay = document.createElement("div");
+      overlay.id = "sidebar-overlay";
+      overlay.className = "sidebar-overlay";
+      overlay.onclick = function() {
+        sidebar.classList.add("collapsed");
+        overlay.classList.remove("visible");
+      };
+      document.body.appendChild(overlay);
+    }
+    overlay.classList.toggle("visible", !sidebar.classList.contains("collapsed"));
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
+//  USER MENU
+// ──────────────────────────────────────────────────────────────
+function toggleUserMenu() {
+  document.getElementById("user-dropdown").classList.toggle("open");
+}
+document.addEventListener("click", function(e) {
+  if (!e.target.closest(".user-menu")) {
+    var dd = document.getElementById("user-dropdown");
+    if (dd) dd.classList.remove("open");
+  }
+});
+
+// ──────────────────────────────────────────────────────────────
+//  CONFIRM DIALOG
+// ──────────────────────────────────────────────────────────────
+function confirm2(title, msg, onOk, okLabel) {
+  document.getElementById("confirm-title").textContent   = title;
+  document.getElementById("confirm-message").textContent = msg;
+  document.getElementById("confirm-ok").textContent      = okLabel || "Confirmar";
+  var overlay = document.getElementById("confirm-overlay");
+  overlay.classList.remove("hidden");
+  document.getElementById("confirm-ok").onclick  = function() { overlay.classList.add("hidden"); onOk(); };
+  document.getElementById("confirm-cancel").onclick = function() { overlay.classList.add("hidden"); };
+}
+
+// ──────────────────────────────────────────────────────────────
+//  KEYBOARD SHORTCUTS
+// ──────────────────────────────────────────────────────────────
+function setupKeyboardShortcuts() {
+  document.addEventListener("keydown", function(e) {
+    var ctrl = e.ctrlKey || e.metaKey;
+    var editorOpen = !document.getElementById("editor-overlay").classList.contains("hidden");
+
+    if (ctrl && e.key === "n" && !editorOpen) { e.preventDefault(); openNoteEditor(null); return; }
+    if (ctrl && e.key === "k") {
+      e.preventDefault();
+      var s = document.getElementById("global-search");
+      s.focus(); s.select(); return;
+    }
+    if (ctrl && e.key === "b" && !e.target.isContentEditable) { e.preventDefault(); toggleSidebar(); return; }
+    if (ctrl && e.key === "d") { e.preventDefault(); toggleTheme(); return; }
+    if (ctrl && e.key === "s" && editorOpen) { e.preventDefault(); clearTimeout(autosaveTimer); saveNote(); return; }
+    if (e.key === "Escape") {
+      if (editorOpen) { closeEditor(); return; }
+      if (!document.getElementById("confirm-overlay").classList.contains("hidden")) {
+        document.getElementById("confirm-overlay").classList.add("hidden"); return;
+      }
+      if (!document.getElementById("shortcuts-overlay").classList.contains("hidden")) {
+        document.getElementById("shortcuts-overlay").classList.add("hidden"); return;
+      }
+    }
+  });
+}
+
+function showShortcuts() {
+  document.getElementById("shortcuts-overlay").classList.remove("hidden");
+}
+
+// ──────────────────────────────────────────────────────────────
+//  TOAST
+// ──────────────────────────────────────────────────────────────
+var TOAST_ICONS = { success:"fa-circle-check", error:"fa-circle-xmark", info:"fa-circle-info", warning:"fa-triangle-exclamation" };
+
+function toast(message, type, duration) {
+  type     = type || "info";
+  duration = duration || 3500;
+  var container = document.getElementById("toast-container");
+  var el = document.createElement("div");
+  el.className = "toast " + type;
+  el.innerHTML = '<i class="fa-solid ' + (TOAST_ICONS[type] || TOAST_ICONS.info) + '"></i><span>' + message + '</span>';
+  el.onclick = function() { dismissToast(el); };
+  container.appendChild(el);
+  setTimeout(function() { dismissToast(el); }, duration);
+}
+
+function dismissToast(el) {
+  el.classList.add("toast-out");
+  setTimeout(function() { if (el.parentNode) el.remove(); }, 300);
+}
+
+// ──────────────────────────────────────────────────────────────
+//  GLOBAL LOADER
+// ──────────────────────────────────────────────────────────────
+function showGlobalLoader() { document.getElementById("global-loader").classList.remove("hidden"); }
+function hideGlobalLoader() { document.getElementById("global-loader").classList.add("hidden"); }
+
+// ──────────────────────────────────────────────────────────────
+//  UTILITIES
+// ──────────────────────────────────────────────────────────────
+function escHtml(str) {
+  return String(str || "")
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+
+function escRegex(str) { return str.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"); }
+
+function timeAgo(date) {
+  if (!date) return "";
+  var now  = new Date();
+  var diff = Math.floor((now - date) / 1000);
+  if (diff < 60) return "agora";
+  if (diff < 3600) return Math.floor(diff/60) + " min atrás";
+  if (diff < 86400) return Math.floor(diff/3600) + "h atrás";
+  if (diff < 604800) return Math.floor(diff/86400) + "d atrás";
+  return formatDate(date);
+}
+
+function formatDate(date) {
+  return date.toLocaleDateString("pt-BR", { day:"2-digit", month:"short", year:"numeric" });
+}
+
+function formatDateFull(date) {
+  return date.toLocaleString("pt-BR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
+}
+
+function firebaseError(e) {
+  var map = {
+    "auth/email-already-in-use":  "E-mail já cadastrado",
+    "auth/invalid-email":         "E-mail inválido",
+    "auth/user-not-found":        "Usuário não encontrado",
+    "auth/wrong-password":        "Senha incorreta",
+    "auth/invalid-credential":    "Credenciais inválidas",
+    "auth/too-many-requests":     "Muitas tentativas. Tente mais tarde",
+    "auth/popup-closed-by-user":  "Login cancelado",
+    "auth/network-request-failed":"Erro de conexão"
+  };
+  return map[e.code] || e.message || "Erro desconhecido";
+}
+
+// ──────────────────────────────────────────────────────────────
+//  EXPOSE GLOBALS (called from HTML onclick="...")
+// ──────────────────────────────────────────────────────────────
+window.showPanel            = showPanel;
+window.togglePassword       = togglePassword;
+window.handleLogin          = handleLogin;
+window.handleRegister       = handleRegister;
+window.handleGoogleLogin    = handleGoogleLogin;
+window.handleForgotPassword = handleForgotPassword;
+window.handleLogout         = handleLogout;
+window.openNoteEditor       = openNoteEditor;
+window.closeEditor          = closeEditor;
+window.handleOverlayClick   = handleOverlayClick;
+window.execCmd              = execCmd;
+window.insertLink           = insertLink;
+window.insertImage          = insertImage;
+window.onEditorInput        = onEditorInput;
+window.handleTagInput       = handleTagInput;
+window.removeTag            = removeTag;
+window.setNoteColor         = setNoteColor;
+window.toggleEditorFavorite = toggleEditorFavorite;
+window.toggleEditorArchive  = toggleEditorArchive;
+window.toggleFavorite       = toggleFavorite;
+window.archiveNote          = archiveNote;
+window.moveToTrash          = moveToTrash;
+window.restoreNote          = restoreNote;
+window.confirmDelete        = confirmDelete;
+window.duplicateCurrentNote = duplicateCurrentNote;
+window.toggleHistory        = toggleHistory;
+window.restoreVersion       = restoreVersion;
+window.exportNotePDF        = exportNotePDF;
+window.exportNoteTXT        = exportNoteTXT;
+window.setFilter            = setFilter;
+window.handleSearch         = handleSearch;
+window.setSort              = setSort;
+window.setView              = setView;
+window.toggleTheme          = toggleTheme;
+window.toggleSidebar        = toggleSidebar;
+window.toggleUserMenu       = toggleUserMenu;
+window.showShortcuts        = showShortcuts;
+window.openCategoryModal    = openCategoryModal;
+window.closeCategoryModal   = closeCategoryModal;
+window.selectIcon           = selectIcon;
+window.saveCategory         = saveCategory;
+window.deleteCategory       = deleteCategory;
+window.toast                = toast;
+
+  </script>
+</body>
+</html>
